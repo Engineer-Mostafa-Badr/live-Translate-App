@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "140313064277",
+    "project_id": "live-translate-app-ea909",
+    "storage_bucket": "live-translate-app-ea909.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:140313064277:android:be645a696297ae87ccf5dc",
+        "android_client_info": {
+          "package_name": "com.example.live_translate_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "140313064277-5m3vs11ec67vdh2bmvh54210sk5m56s7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.live_translate_app",
+            "certificate_hash": "64491266333c2dc9c468d00573e4a70e91c91c56"
+          }
+        },
+        {
+          "client_id": "140313064277-eoj1h10ne76qji0c9nu6lkvghi56oosn.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBxWqg__7mTAh_WOueGScCaau91nIwkI7c"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "140313064277-eoj1h10ne76qji0c9nu6lkvghi56oosn.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "140313064277-kv9bebnergoql8i7abkqtdk7ff9plh7b.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.liveTranslateApp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
