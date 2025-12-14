@@ -16,8 +16,11 @@ class OverlayWidget extends StatelessWidget {
         child: Container(
           height: 60,
           width: 60,
-          decoration: BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
-          child: const Icon(Icons.translate, color: Colors.red),
+          decoration: const BoxDecoration(
+            color: Colors.blue,
+            shape: BoxShape.circle,
+          ),
+          child: const Icon(Icons.translate, color: Colors.white),
         ),
       ),
     );

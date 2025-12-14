@@ -8,6 +8,9 @@ class HomeController extends GetxController {
   final RxBool isDesktopSite = false.obs;
   final TextEditingController urlController = TextEditingController();
 
+  /// حالة الفقاعة (تشغيل / إيقاف)
+  RxBool isTranslating = false.obs;
+
   @override
   void onInit() {
     super.onInit();
@@ -37,10 +40,22 @@ class HomeController extends GetxController {
     super.onClose();
   }
 
+  /// تهيئة أي بيانات أولية
+  void _initialize() async {
+    Logger.log('Home page initialized');
+    isLoading.value = true;
+    await Future.delayed(const Duration(milliseconds: 500));
+    isLoading.value = false;
+    Logger.success('Home page loaded successfully');
+  }
+
+  // Overlay Bubble Actions
   void startOverlayBubble() async {
     try {
       final started = await OverlayController.startOverlay();
-      if (!started) {
+      if (started) {
+        isTranslating.value = true;
+      } else {
         Get.snackbar(
           'تنبيه',
           'من فضلك فعّل السماح بالظهور فوق التطبيقات',
@@ -50,20 +65,23 @@ class HomeController extends GetxController {
     } catch (e) {
       Get.snackbar(
         "خطأ",
-        "Overlay فشل في التشغيل: $e",
+        "فشل تشغيل Overlay: $e",
         snackPosition: SnackPosition.BOTTOM,
       );
     }
   }
 
-  void _initialize() async {
-    Logger.log('Home page initialized');
-    isLoading.value = true;
+  void stopOverlayBubble() async {
+    await OverlayController.stopOverlay();
+    isTranslating.value = false;
+  }
 
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    isLoading.value = false;
-    Logger.success('Home page loaded successfully');
+  void toggleOverlayBubble() {
+    if (isTranslating.value) {
+      stopOverlayBubble();
+    } else {
+      startOverlayBubble();
+    }
   }
 
   // Browser Actions

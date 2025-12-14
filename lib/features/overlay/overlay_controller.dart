@@ -5,23 +5,45 @@ class OverlayController {
     'com.livetranslate.app/overlay',
   );
 
-  /// تشغيل الـ Overlay (سيفتح الصلاحية لو مش موجودة)
-  static Future<bool> startOverlay() async {
+  /// ✅ التحقق من إذن الظهور فوق التطبيقات
+  static Future<bool> checkPermission() async {
     try {
-      final res = await _channel.invokeMethod('start_overlay');
-      return res == true;
+      final bool result = await _channel.invokeMethod(
+        'check_overlay_permission',
+      );
+      return result;
     } catch (e) {
       return false;
     }
   }
 
-  /// ايقاف الفقاعة
+  /// 🔓 فتح صفحة إعدادات الإذن
+  static Future<bool> openOverlayPermissionSettings() async {
+    try {
+      await _channel.invokeMethod('open_overlay_settings');
+      return true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// ▶️ تشغيل الفقاعة
+  static Future<bool> startOverlay() async {
+    try {
+      final res = await _channel.invokeMethod('start_overlay');
+      return res == true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// ⏹️ إيقاف الفقاعة
   static Future<void> stopOverlay() async {
     await _channel.invokeMethod('stop_overlay');
   }
 
-  /// استقبال الضغطات من الفقاعة
-  static void listen(Function() onClick) {
+  /// 👂 الاستماع لضغط الفقاعة
+  static void listen(Function onClick) {
     _channel.setMethodCallHandler((call) async {
       if (call.method == 'overlay_clicked') {
         onClick();

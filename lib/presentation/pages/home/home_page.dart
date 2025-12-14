@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import '../../../features/overlay/overlay_controller.dart';
+import '../../../features/overlay/overlay_permission_page.dart';
 import 'home_controller.dart';
 import '../../widgets/chrome_url_bar.dart';
 import '../../widgets/chrome_menu.dart';
@@ -10,129 +12,6 @@ import 'widgets/features_grid.dart';
 
 class HomePage extends GetView<HomeController> {
   const HomePage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    // Initialize controller
-    final HomeController controller = Get.put(HomeController());
-
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        body: SafeArea(
-          child: Column(
-            children: [
-              // Chrome-style URL Bar
-              Obx(
-                () => ChromeUrlBar(
-                  controller: controller.urlController,
-                  onSubmitted: controller.loadUrl,
-                  onRefresh: controller.openBrowser,
-                  onClear: controller.clearUrl,
-                  onMicrophone: controller.voiceSearch,
-                  isLoading: controller.isLoading.value,
-                  pageTitle: 'ابحث أو اكتب عنوان URL',
-                  currentUrl: '',
-                ),
-              ),
-
-              // Main Content
-              Expanded(
-                child: Obx(() {
-                  if (controller.isLoading.value) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  return SingleChildScrollView(
-                    padding: EdgeInsets.all(16.w),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // Welcome Card
-                        _buildWelcomeCard(context),
-
-                        SizedBox(height: 24.h),
-
-                        // Quick Actions
-                        QuickActions(
-                          onOpenBrowser: controller.openBrowser,
-                          onVoiceSearch: controller.voiceSearch,
-                          onSettings: controller.openSettings,
-                          onNewTab: controller.newTab,
-                          onIncognito: controller.newIncognitoTab,
-                        ),
-
-                        SizedBox(height: 24.h),
-
-                        // Features Grid
-                        FeaturesGrid(
-                          onBookmarks: controller.openBookmarks,
-                          onHistory: controller.openHistory,
-                          onDownloads: controller.openDownloads,
-                          onTranslate: controller.openTextTranslation,
-                          onVoiceTranslate: controller.openVoiceTranslation,
-                          onCameraTranslate: controller.openCameraTranslation,
-                          onShare: controller.sharePage,
-                          onFindInPage: controller.findInPage,
-                        ),
-
-                        SizedBox(height: 24.h),
-
-                        ElevatedButton(
-                          onPressed: controller.startOverlayBubble,
-
-                          child: const Text('تشغيل الفقاعة'),
-                        ),
-
-                        // Chrome Tips Card
-                        _buildChromeTipsCard(context),
-
-                        SizedBox(height: 16.h),
-                      ],
-                    ),
-                  );
-                }),
-              ),
-            ],
-          ),
-        ),
-
-        // Chrome-style Bottom Navigation
-        bottomNavigationBar: ChromeBottomNav(
-          onBack: () => Get.back(),
-          onForward: () => controller.openBrowser(),
-          onHome: () {
-            // Already on home
-            Get.snackbar(
-              'الصفحة الرئيسية',
-              'أنت بالفعل في الصفحة الرئيسية',
-              snackPosition: SnackPosition.BOTTOM,
-              duration: const Duration(seconds: 1),
-            );
-          },
-          onTabs: controller.newTab,
-          onNewTab: controller.newTab,
-          onMenu: () => _showChromeMenu(context),
-          canGoBack: false,
-          canGoForward: false,
-          tabCount: 1,
-        ),
-
-        // Floating Action Button for Quick Browser Access
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: controller.openBrowser,
-          backgroundColor: Theme.of(context).primaryColor,
-          icon: Icon(Icons.web, size: 24.sp),
-          label: Text(
-            'فتح المتصفح',
-            style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
-          ),
-          tooltip: 'فتح المتصفح المدمج',
-        ),
-      ),
-    );
-  }
 
   Widget _buildWelcomeCard(BuildContext context) {
     return Card(
@@ -321,6 +200,158 @@ class HomePage extends GetView<HomeController> {
       onFindInPage: controller.findInPage,
       onDesktopSite: controller.toggleDesktopSite,
       isDesktopSite: controller.isDesktopSite.value,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Initialize controller
+    final HomeController controller = Get.put(HomeController());
+
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        body: SafeArea(
+          child: Column(
+            children: [
+              // Chrome-style URL Bar
+              Obx(
+                () => ChromeUrlBar(
+                  controller: controller.urlController,
+                  onSubmitted: controller.loadUrl,
+                  onRefresh: controller.openBrowser,
+                  onClear: controller.clearUrl,
+                  onMicrophone: controller.voiceSearch,
+                  isLoading: controller.isLoading.value,
+                  pageTitle: 'ابحث أو اكتب عنوان URL',
+                  currentUrl: '',
+                ),
+              ),
+
+              // Main Content
+              Expanded(
+                child: Obx(() {
+                  if (controller.isLoading.value) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+
+                  return SingleChildScrollView(
+                    padding: EdgeInsets.all(16.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Welcome Card
+                        _buildWelcomeCard(context),
+
+                        SizedBox(height: 24.h),
+
+                        // Quick Actions
+                        QuickActions(
+                          onOpenBrowser: controller.openBrowser,
+                          onVoiceSearch: controller.voiceSearch,
+                          onSettings: controller.openSettings,
+                          onNewTab: controller.newTab,
+                          onIncognito: controller.newIncognitoTab,
+                        ),
+
+                        SizedBox(height: 24.h),
+
+                        // Features Grid
+                        FeaturesGrid(
+                          onBookmarks: controller.openBookmarks,
+                          onHistory: controller.openHistory,
+                          onDownloads: controller.openDownloads,
+                          onTranslate: controller.openTextTranslation,
+                          onVoiceTranslate: controller.openVoiceTranslation,
+                          onCameraTranslate: controller.openCameraTranslation,
+                          onShare: controller.sharePage,
+                          onFindInPage: controller.findInPage,
+                        ),
+
+                        SizedBox(height: 24.h),
+
+                        ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 25,
+                              vertical: 16,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          onPressed: () async {
+                            final hasPermission =
+                                await OverlayController.checkPermission();
+
+                            if (!hasPermission) {
+                              Get.to(() => const OverlayPermissionPage());
+                              return;
+                            }
+
+                            final started =
+                                await OverlayController.startOverlay();
+
+                            if (!started) {
+                              Get.snackbar("خطأ", "تعذّر تشغيل الفقاعة");
+                            }
+                          },
+                          icon: const Icon(Icons.bubble_chart, size: 26),
+                          label: const Text(
+                            "تشغيل الترجمه الفوريه ",
+                            style: TextStyle(fontSize: 18),
+                          ),
+                        ),
+                        SizedBox(height: 16.h),
+
+                        // Chrome Tips Card
+                        _buildChromeTipsCard(context),
+
+                        SizedBox(height: 16.h),
+                      ],
+                    ),
+                  );
+                }),
+              ),
+            ],
+          ),
+        ),
+
+        // Chrome-style Bottom Navigation
+        bottomNavigationBar: ChromeBottomNav(
+          onBack: () => Get.back(),
+          onForward: () => controller.openBrowser(),
+          onHome: () {
+            // Already on home
+            Get.snackbar(
+              'الصفحة الرئيسية',
+              'أنت بالفعل في الصفحة الرئيسية',
+              snackPosition: SnackPosition.BOTTOM,
+              duration: const Duration(seconds: 1),
+            );
+          },
+          onTabs: controller.newTab,
+          onNewTab: controller.newTab,
+          onMenu: () => _showChromeMenu(context),
+          canGoBack: false,
+          canGoForward: false,
+          tabCount: 1,
+        ),
+
+        // Floating Action Button for Quick Browser Access
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: controller.openBrowser,
+          backgroundColor: Theme.of(context).primaryColor,
+          icon: Icon(Icons.web, size: 24.sp),
+          label: Text(
+            'فتح المتصفح',
+            style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600),
+          ),
+          tooltip: 'فتح المتصفح المدمج',
+        ),
+      ),
     );
   }
 }

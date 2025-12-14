@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
-import 'package:live_translate_app/core/services/supabase_subscription_service.dart';
+// import 'package:live_translate_app/core/services/supabase_subscription_service.dart';
 import 'package:live_translate_app/domain/entities/subscription_plan.dart';
 
 /// Unit Tests for SupabaseSubscriptionService
-/// 
+///
 /// NOTE: These are PLACEHOLDER tests that demonstrate the structure.
 /// In production, you would:
 /// 1. Mock Supabase client
@@ -14,12 +14,12 @@ import 'package:live_translate_app/domain/entities/subscription_plan.dart';
 
 void main() {
   group('SupabaseSubscriptionService Tests', () {
-    late SupabaseSubscriptionService service;
+    // late SupabaseSubscriptionService service;
 
     setUp(() {
       // Initialize GetX for testing
       Get.testMode = true;
-      
+
       // NOTE: In production, initialize with mocked Supabase client
       // service = SupabaseSubscriptionService();
     });
@@ -32,36 +32,36 @@ void main() {
       // ARRANGE
       // Mock user authentication
       // Mock Supabase response
-      
+
       // ACT
       // final subscription = await service.getCurrentSubscription();
-      
+
       // ASSERT
       // expect(subscription, isNotNull);
       // expect(subscription?.tier, equals('free'));
-      
+
       // This is a placeholder - actual implementation requires mocking
       expect(true, true);
     });
 
     test('PLACEHOLDER: should create checkout session', () async {
       // ARRANGE
-      const priceId = 'price_test_123';
-      
+      // const priceId = 'price_test_123';
+
       // ACT
       // final sessionUrl = await service.createCheckoutSession(priceId: priceId);
-      
+
       // ASSERT
       // expect(sessionUrl, isNotNull);
       // expect(sessionUrl, contains('checkout.stripe.com'));
-      
+
       expect(true, true);
     });
 
     test('PLACEHOLDER: should track usage correctly', () async {
       // ARRANGE
-      const usageType = 'translation';
-      
+      // const usageType = 'translation';
+
       // ACT
       // await service.trackUsage(
       //   usageType: usageType,
@@ -69,36 +69,36 @@ void main() {
       //   targetLanguage: 'ar',
       //   characterCount: 100,
       // );
-      
+
       // ASSERT
       // Verify usage was inserted into database
-      
+
       expect(true, true);
     });
 
     test('PLACEHOLDER: should get remaining daily limit', () async {
       // ARRANGE
-      const usageType = 'translation';
-      
+      // const usageType = 'translation';
+
       // ACT
       // final remaining = await service.getRemainingDailyLimit(usageType);
-      
+
       // ASSERT
       // expect(remaining, greaterThanOrEqualTo(0));
-      
+
       expect(true, true);
     });
 
     test('PLACEHOLDER: should cancel subscription', () async {
       // ARRANGE
-      const immediately = false;
-      
+      // const immediately = false;
+
       // ACT
       // final success = await service.cancelSubscription(immediately: immediately);
-      
+
       // ASSERT
       // expect(success, true);
-      
+
       expect(true, true);
     });
 
@@ -112,7 +112,7 @@ void main() {
         adFree: true,
         prioritySupport: true,
       );
-      
+
       // ASSERT
       expect(limits.isUnlimitedTranslations, true);
       expect(limits.isUnlimitedOCR, true);
@@ -125,10 +125,10 @@ void main() {
         billingPeriod: 'yearly',
         stripePriceId: 'price_test',
       );
-      
+
       // ACT
       final monthlyPrice = yearlyPlan.monthlyPrice;
-      
+
       // ASSERT
       expect(monthlyPrice, equals(yearlyPlan.price / 12));
     });
@@ -152,7 +152,7 @@ void main() {
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
       );
-      
+
       // ASSERT
       expect(activeSubscription.isActive, true);
       expect(activeSubscription.daysRemaining, greaterThan(0));
@@ -163,7 +163,7 @@ void main() {
     test('should create free plan correctly', () {
       // ACT
       final freePlan = SubscriptionPlan.free();
-      
+
       // ASSERT
       expect(freePlan.tier, equals('free'));
       expect(freePlan.price, equals(0));
@@ -178,12 +178,12 @@ void main() {
         billingPeriod: 'monthly',
         stripePriceId: 'price_basic_monthly',
       );
-      
+
       final basicYearly = SubscriptionPlan.basic(
         billingPeriod: 'yearly',
         stripePriceId: 'price_basic_yearly',
       );
-      
+
       // ASSERT
       expect(basicMonthly.tier, equals('basic'));
       expect(basicMonthly.price, equals(4.99));
@@ -197,7 +197,7 @@ void main() {
         billingPeriod: 'monthly',
         stripePriceId: 'price_pro_monthly',
       );
-      
+
       // ASSERT
       expect(proPlan.tier, equals('pro'));
       expect(proPlan.isPopular, true);
@@ -211,7 +211,7 @@ void main() {
         billingPeriod: 'monthly',
         stripePriceId: 'price_premium_monthly',
       );
-      
+
       // ASSERT
       expect(premiumPlan.tier, equals('premium'));
       expect(premiumPlan.isUnlimited, true);

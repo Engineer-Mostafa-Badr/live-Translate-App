@@ -2,10 +2,11 @@ package com.example.live_translate_app
 
 import android.app.*
 import android.content.*
-import android.graphics.*
+import android.graphics.PixelFormat
 import android.os.Build
 import android.os.IBinder
 import android.view.*
+import android.widget.ImageView
 import androidx.core.app.NotificationCompat
 
 class ScreenOverlayService : Service() {
@@ -18,7 +19,8 @@ class ScreenOverlayService : Service() {
     }
 
     private lateinit var windowManager: WindowManager
-    private var bubble: View? = null
+    private var bubbleView: View? = null
+    private var isRunning = true
 
     override fun onCreate() {
         super.onCreate()
@@ -27,7 +29,7 @@ class ScreenOverlayService : Service() {
     }
 
     private fun createNotification() {
-        if (Build.VERSION.SDK_INT >= 26) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
                 "Overlay Service",
@@ -39,7 +41,7 @@ class ScreenOverlayService : Service() {
 
         val notification = NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle("Live Translate")
-            .setContentText("Bubble Running")
+            .setContentText("Bubble running")
             .setSmallIcon(android.R.drawable.ic_menu_info_details)
             .build()
 
@@ -49,67 +51,89 @@ class ScreenOverlayService : Service() {
     private fun showBubble() {
         windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
 
-        val view = View(this).apply {
-            setBackgroundColor(Color.BLUE)
-        }
-        bubble = view
+        val view = LayoutInflater.from(this)
+            .inflate(R.layout.overlay_bubble, null)
+
+        bubbleView = view
+
+        val toggleBtn = view.findViewById<ImageView>(R.id.btnToggle)
+        val closeBtn = view.findViewById<ImageView>(R.id.btnClose)
 
         val params = WindowManager.LayoutParams(
-            140,
-            140,
+            WindowManager.LayoutParams.WRAP_CONTENT,
+            WindowManager.LayoutParams.WRAP_CONTENT,
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
                 WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY
             else
                 WindowManager.LayoutParams.TYPE_PHONE,
-            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or
-                    WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
+            WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE,
             PixelFormat.TRANSLUCENT
         )
 
         params.gravity = Gravity.END or Gravity.CENTER_VERTICAL
 
-        view.setOnTouchListener(object : View.OnTouchListener {
-            var lastX = 0f
-            var lastY = 0f
-            var isClick = true
+        // تحريك الفقاعة بحرية وبسلاسة
+        var initialX = 0
+        var initialY = 0
+        var initialTouchX = 0f
+        var initialTouchY = 0f
 
-            override fun onTouch(v: View?, e: MotionEvent): Boolean {
-                when (e.action) {
-                    MotionEvent.ACTION_DOWN -> {
-                        lastX = e.rawX
-                        lastY = e.rawY
-                        isClick = true
-                        return true
-                    }
-                    MotionEvent.ACTION_MOVE -> {
-                        params.x -= (e.rawX - lastX).toInt()
-                        params.y += (e.rawY - lastY).toInt()
-                        windowManager.updateViewLayout(view, params)
-                        lastX = e.rawX
-                        lastY = e.rawY
-                        isClick = false
-                        return true
-                    }
-                    MotionEvent.ACTION_UP -> {
-                        if (isClick) {
-                            sendBroadcast(Intent(BROADCAST_OVERLAY_CLICK))
-                        }
-                        return true
-                    }
+        view.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    initialX = params.x
+                    initialY = params.y
+                    initialTouchX = event.rawX
+                    initialTouchY = event.rawY
+                    true
                 }
-                return false
+
+                MotionEvent.ACTION_MOVE -> {
+                    val dx = (event.rawX - initialTouchX).toInt()
+                    val dy = (event.rawY - initialTouchY).toInt()
+
+                    params.x = initialX + dx
+                    params.y = initialY + dy
+
+                    windowManager.updateViewLayout(view, params)
+                    true
+                }
+
+                MotionEvent.ACTION_UP -> true
+                else -> false
             }
-        })
+        }
+
+        // تشغيل / إيقاف
+        toggleBtn.setOnClickListener {
+            isRunning = !isRunning
+            toggleBtn.setImageResource(
+                if (isRunning)
+                    android.R.drawable.ic_media_pause
+                else
+                    android.R.drawable.ic_media_play
+            )
+
+            sendBroadcast(
+                Intent(BROADCAST_OVERLAY_CLICK)
+                    .putExtra("running", isRunning)
+            )
+        }
+
+        // إغلاق الفقاعة
+        closeBtn.setOnClickListener {
+            stopSelf()
+        }
 
         windowManager.addView(view, params)
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        bubble?.let {
-            kotlin.runCatching { windowManager.removeView(it) }
+        bubbleView?.let {
+            runCatching { windowManager.removeView(it) }
         }
-        bubble = null
+        bubbleView = null
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
