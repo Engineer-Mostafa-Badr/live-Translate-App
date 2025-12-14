@@ -4,7 +4,9 @@
     android:layout_height="wrap_content"
     android:clipChildren="false"
     android:clipToPadding="false"
-    android:elevation="12dp">
+    android:elevation="12dp"
+    android:clickable="true"
+    android:focusable="true">
     <!-- Bubble Body -->
     <LinearLayout
         android:id="@+id/bubbleRoot"
@@ -13,8 +15,8 @@
         android:background="@drawable/bubble_bg"
         android:gravity="center"
         android:orientation="vertical"
-        android:clickable="true"
-        android:focusable="true">
+        android:clickable="false"
+        android:focusable="false">
         <!-- ON / OFF icon -->
         <ImageView
             android:id="@+id/btnToggle"
@@ -31,7 +33,6 @@
         android:layout_width="22dp"
         android:layout_height="22dp"
         android:layout_gravity="top|end"
-        android:layout_margin="0dp"
         android:background="@drawable/bubble_close_bg"
         android:padding="4dp"
         android:src="@android:drawable/ic_menu_close_clear_cancel"

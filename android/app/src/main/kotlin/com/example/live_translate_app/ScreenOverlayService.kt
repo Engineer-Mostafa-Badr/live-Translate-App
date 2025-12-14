@@ -59,6 +59,7 @@ class ScreenOverlayService : Service() {
         val toggleBtn = view.findViewById<ImageView>(R.id.btnToggle)
         val closeBtn = view.findViewById<ImageView>(R.id.btnClose)
 
+        // تعديل LayoutParams لحركة الفقاعة
         val params = WindowManager.LayoutParams(
             WindowManager.LayoutParams.WRAP_CONTENT,
             WindowManager.LayoutParams.WRAP_CONTENT,
@@ -70,14 +71,21 @@ class ScreenOverlayService : Service() {
             PixelFormat.TRANSLUCENT
         )
 
-        params.gravity = Gravity.END or Gravity.CENTER_VERTICAL
+        // Gravity للتحكم الكامل في المكان
+        params.gravity = Gravity.TOP or Gravity.START
 
-        // تحريك الفقاعة بحرية وبسلاسة
-        var initialX = 0
-        var initialY = 0
+        // تحديد الموقع الابتدائي: منتصف الشاشة على اليسار
+        val displayMetrics = resources.displayMetrics
+        params.x = 0
+        params.y = displayMetrics.heightPixels / 2 - 64 // 64 = ارتفاع الفقاعة
+
+        // متغيرات لتتبع حركة اللمس
+        var initialX = params.x
+        var initialY = params.y
         var initialTouchX = 0f
         var initialTouchY = 0f
 
+        // OnTouchListener لتتبع حركة الفقاعة
         view.setOnTouchListener { _, event ->
             when (event.action) {
                 MotionEvent.ACTION_DOWN -> {
@@ -89,12 +97,8 @@ class ScreenOverlayService : Service() {
                 }
 
                 MotionEvent.ACTION_MOVE -> {
-                    val dx = (event.rawX - initialTouchX).toInt()
-                    val dy = (event.rawY - initialTouchY).toInt()
-
-                    params.x = initialX + dx
-                    params.y = initialY + dy
-
+                    params.x = initialX + (event.rawX - initialTouchX).toInt()
+                    params.y = initialY + (event.rawY - initialTouchY).toInt()
                     windowManager.updateViewLayout(view, params)
                     true
                 }
@@ -104,7 +108,7 @@ class ScreenOverlayService : Service() {
             }
         }
 
-        // تشغيل / إيقاف
+        // زر التشغيل / الإيقاف
         toggleBtn.setOnClickListener {
             isRunning = !isRunning
             toggleBtn.setImageResource(
@@ -120,7 +124,7 @@ class ScreenOverlayService : Service() {
             )
         }
 
-        // إغلاق الفقاعة
+        // زر الإغلاق
         closeBtn.setOnClickListener {
             stopSelf()
         }
